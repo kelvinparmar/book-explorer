@@ -1,0 +1,133 @@
+/* ============================================================
+   Book Explorer — "Card Catalog" design system
+   Palette: deep stacks-green + brass + parchment ecru + rust accent
+   Type: Fraunces (display serif) / Work Sans (body) / Space Mono (catalog data)
+   ============================================================ */
+
+:root {
+  /* Color */
+  --color-ink: #14201b;        /* deep stacks green — chrome/bg */
+  --color-ink-soft: #1f2f27;   /* raised panels on dark */
+  --color-parchment: #ede6d6;  /* card surface */
+  --color-parchment-dim: #e2d9c4;
+  --color-text-dark: #1f2a24;  /* text on parchment */
+  --color-text-light: #f3eee0; /* text on ink */
+  --color-brass: #c08a34;      /* primary accent */
+  --color-brass-hover: #d9a248;
+  --color-rust: #a63d40;       /* favorite / remove accent */
+  --color-rust-hover: #bd4a4d;
+  --color-line: rgba(20, 32, 27, 0.16);
+  --color-line-light: rgba(243, 238, 224, 0.2);
+
+  /* Type */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+
+  /* Layout */
+  --radius: 3px;
+  --shadow-card: 0 2px 0 rgba(20, 32, 27, 0.08), 0 8px 20px rgba(20, 32, 27, 0.10);
+  --max-width: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-parchment);
+  color: var(--color-text-dark);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-brass);
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--color-brass);
+  color: var(--color-ink);
+  padding: 10px 16px;
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+}
