@@ -80,6 +80,41 @@ describe('FavoritesContext', () => {
     expect(stored[0].id).toBe('abc123');
   });
 
+  it('manages comment history for a favorited book', () => {
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+
+    act(() => {
+      result.current.addFavorite(book);
+      result.current.addComment('abc123', 'First read');
+      result.current.addComment('abc123', 'Second read');
+    });
+
+    expect(result.current.favorites[0].comments).toHaveLength(2);
+
+    act(() => {
+      result.current.editComment('abc123', result.current.favorites[0].comments[0].id, 'Updated read');
+    });
+
+    act(() => {
+      result.current.deleteComment('abc123', result.current.favorites[0].comments[1].id);
+    });
+
+    expect(result.current.favorites[0].comments).toHaveLength(1);
+    expect(result.current.favorites[0].comments[0].text).toBe('Updated read');
+  });
+
+  it('creates comment history for a book even before it is favorited', () => {
+    const { result } = renderHook(() => useFavorites(), { wrapper });
+
+    act(() => {
+      result.current.addComment('abc123', 'First read', book);
+    });
+
+    expect(result.current.favorites).toHaveLength(1);
+    expect(result.current.favorites[0].comments).toHaveLength(1);
+    expect(result.current.favorites[0].comments[0].text).toBe('First read');
+  });
+
   it('throws when used outside of a FavoritesProvider', () => {
     // Suppress the expected React error boundary console noise for this case.
     const spy = jest.spyOn(console, 'error').mockImplementation(() => {});

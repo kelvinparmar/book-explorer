@@ -8,11 +8,16 @@ import './BookDetailsPage.css';
 
 function BookDetailsPage() {
   const { id } = useParams();
-  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+  const { favorites, isFavorite, addFavorite, removeFavorite, updateNotes, addComment, editComment, deleteComment } = useFavorites();
 
   const [book, setBook] = useState(null);
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState('');
+  const [notes, setNotes] = useState('');
+  const [saved, setSaved] = useState(true);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [commentStatus, setCommentStatus] = useState('');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -31,6 +36,65 @@ function BookDetailsPage() {
 
     return () => controller.abort();
   }, [id]);
+
+  useEffect(() => {
+    if (!book) return;
+
+    const existingFavorite = favorites.find((favorite) => favorite.id === book.id);
+    setNotes(existingFavorite?.notes || '');
+    setSaved(true);
+    setCommentDraft('');
+    setEditingCommentId(null);
+    setCommentStatus('');
+  }, [book, favorites]);
+
+  const handleNotesChange = (event) => {
+    setNotes(event.target.value);
+    setSaved(false);
+  };
+
+  const handleSaveNotes = () => {
+    if (!book) return;
+
+    if (favorited) {
+      updateNotes(book.id, notes);
+    } else if (notes.trim()) {
+      addFavorite(book, notes.trim());
+    }
+
+    setSaved(true);
+  };
+
+  const handleSaveComment = () => {
+    if (!book || !commentDraft.trim()) return;
+
+    if (editingCommentId) {
+      editComment(book.id, editingCommentId, commentDraft);
+      setCommentStatus('Comment updated');
+      setEditingCommentId(null);
+    } else {
+      addComment(book.id, commentDraft, book);
+      setCommentStatus('Comment saved to history');
+    }
+
+    setCommentDraft('');
+  };
+
+  const handleEditComment = (comment) => {
+    setEditingCommentId(comment.id);
+    setCommentDraft(comment.text);
+    setCommentStatus('');
+  };
+
+  const handleDeleteComment = (commentId) => {
+    if (!book) return;
+    deleteComment(book.id, commentId);
+    if (editingCommentId === commentId) {
+      setEditingCommentId(null);
+      setCommentDraft('');
+    }
+    setCommentStatus('Comment deleted');
+  };
 
   if (status === 'loading') {
     return (
@@ -78,6 +142,65 @@ function BookDetailsPage() {
           >
             {favorited ? '★ Remove from favorites' : '☆ Add to favorites'}
           </button>
+
+          <div className="book-details__notes">
+            <label htmlFor={`book-notes-${book.id}`}>Notes / tags</label>
+            <textarea
+              id={`book-notes-${book.id}`}
+              value={notes}
+              onChange={handleNotesChange}
+              placeholder="e.g. book club pick, to re-read"
+              rows={3}
+            />
+            <button type="button" onClick={handleSaveNotes} disabled={saved} className="book-details__save">
+              {saved ? 'Saved' : 'Save note'}
+            </button>
+
+            <div className="book-details__comments">
+              <label htmlFor={`book-comment-${book.id}`}>Book history</label>
+              <textarea
+                id={`book-comment-${book.id}`}
+                value={commentDraft}
+                onChange={(event) => setCommentDraft(event.target.value)}
+                placeholder="Add a comment or note history entry"
+                rows={3}
+              />
+              <div className="book-details__comments-actions">
+                <button type="button" onClick={handleSaveComment} className="book-details__save">
+                  {editingCommentId ? 'Update comment' : 'Add comment'}
+                </button>
+                {editingCommentId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingCommentId(null);
+                      setCommentDraft('');
+                    }}
+                    className="book-details__cancel"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+              {commentStatus && <p className="book-details__comment-status" role="status">{commentStatus}</p>}
+
+              <ul className="book-details__comment-list">
+                {(favorites.find((favorite) => favorite.id === book.id)?.comments || []).map((comment) => (
+                  <li key={comment.id} className="book-details__comment-item">
+                    <p>{comment.text}</p>
+                    <div className="book-details__comment-actions">
+                      <button type="button" onClick={() => handleEditComment(comment)} className="book-details__link-btn">
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => handleDeleteComment(comment.id)} className="book-details__link-btn">
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
         <div className="book-details__body">

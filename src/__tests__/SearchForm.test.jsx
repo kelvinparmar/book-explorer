@@ -37,6 +37,15 @@ describe('SearchForm', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
+  it('shows title suggestions while typing', async () => {
+    const user = userEvent.setup();
+    render(<SearchForm onSearch={jest.fn()} isLoading={false} />);
+
+    await user.type(screen.getByLabelText(/title/i), 'du');
+
+    expect(screen.getByRole('option', { name: /dune/i })).toBeInTheDocument();
+  });
+
   it('disables the submit button while loading', () => {
     render(<SearchForm onSearch={jest.fn()} isLoading={true} />);
     expect(screen.getByRole('button', { name: /searching/i })).toBeDisabled();

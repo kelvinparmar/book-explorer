@@ -102,3 +102,32 @@
   color: var(--color-text-light);
   border-color: var(--color-rust);
 }
+
+@media (max-width: 600px) {
+  .book-card__cover-wrap {
+    padding: 16px 16px 0;
+  }
+
+  .book-card__cover {
+    height: 140px;
+  }
+
+  .book-card__body {
+    padding: 14px 16px 16px;
+  }
+
+  .book-card__title {
+    font-size: 1rem;
+  }
+
+  .book-card__desc {
+    font-size: 0.84rem;
+  }
+
+  .book-card__fav {
+    width: 30px;
+    height: 30px;
+    top: 10px;
+    right: 10px;
+  }
+}

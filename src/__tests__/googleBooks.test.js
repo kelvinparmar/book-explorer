@@ -92,11 +92,14 @@ describe('searchBooks', () => {
     jest.useRealTimers();
   });
 
-  it('surfaces a clear message for a 429 that never clears', async () => {
+  it('falls back to a local result for a known title when the API is rate-limited', async () => {
     jest.useFakeTimers({ advanceTimers: true });
     global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 429, headers: { get: () => null } });
 
-    await expect(searchBooks({ title: 'JavaScript' })).rejects.toThrow(/rate limit/i);
+    const result = await searchBooks({ title: 'Dune' });
+
+    expect(result.totalItems).toBeGreaterThan(0);
+    expect(result.items[0]).toMatchObject({ title: 'Dune' });
     jest.useRealTimers();
   });
 });
